@@ -18,7 +18,7 @@ void path_pop(char *path, size_t *pos) {
 }
 
 
-void walk_func(char *path, int depth) {
+void walk_func(char *path) {
     printf("%s\n", path);
 }
 
@@ -31,7 +31,7 @@ void nonRecursiveWalker() {
 
     dirs[depth++] = opendir(".");
     if (!dirs[depth-1]) {
-        fprintf(stderr, "Error opening this directory\n", path);
+        fprintf(stderr, "Error opening this directory\n");
         return;
     }
 
@@ -50,13 +50,13 @@ void nonRecursiveWalker() {
             if (entry->d_type == DT_DIR) {
                 dirs[depth++] = opendir(path);
                 if (!dirs[depth-1]) {
-                    fprintf(stderr, "Error opening directory %s: Not enough file descriptors (%d)\n", path, depth);
+                    fprintf(stderr, "Error opening directory %s: Not enough file descriptors (%ld)\n", path, depth);
                     break;
                 }
                 continue;
             }
             if (entry->d_type == DT_REG)
-                walk_func(path, depth);
+                walk_func(path);
         }
         else {
             closedir(dirs[--depth]);

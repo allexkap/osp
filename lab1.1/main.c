@@ -4,6 +4,9 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <getopt.h>
+#include <stdlib.h>
+
+char debug_mode = 0;
 
 
 int path_push(char *path, size_t *pos, char *name) {
@@ -114,6 +117,8 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Not enough arguments\n");
         return 1;
     }
+
+    if (getenv("LAB11DEBUG")) debug_mode = 1;
 
     nonRecursiveWalker();
 

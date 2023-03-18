@@ -45,16 +45,16 @@ void nonRecursiveWalker(void (*walk_func)(const char*)) {
             if (path_push(path, &pos, entry->d_name)) {
                 path_pop(path, &pos);
                 fprintf(stderr, "Error opening path %s/%s: File name too long\n", path, entry->d_name);
-                break;
+                continue;
             }
 
             if (entry->d_type == DT_DIR) {
                 dirs[depth++] = opendir(path);
                 if (!dirs[depth-1]) {
-                    fprintf(stderr, "Error opening directory %s: Not enough file descriptors (%ld)\n", path, depth);
-                    break;
+                    fprintf(stderr, "Error opening directory %s\n", path);
+                    --depth;
                 }
-                continue;
+                else continue;
             }
             if (entry->d_type == DT_REG)
                 walk_func(path);

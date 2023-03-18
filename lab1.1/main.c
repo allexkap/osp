@@ -6,7 +6,6 @@
 #include <getopt.h>
 #include <stdlib.h>
 
-char debug_mode = 0;
 
 
 int path_push(char *path, size_t *pos, char *name) {
@@ -16,18 +15,14 @@ int path_push(char *path, size_t *pos, char *name) {
     return 1;
 }
 
+
 void path_pop(char *path, size_t *pos) {
     while (*pos && path[--(*pos)] != '/');
     path[*pos] = '\0';
 }
 
 
-char *pattern_wf = 0;
-void walk_func(char *path) {
-    printf("%s\n", path);
-}
-
-void nonRecursiveWalker() {
+void nonRecursiveWalker(void (*walk_func)(const char*)) {
 
     DIR *dirs[PATH_MAX/2];
     char path[PATH_MAX];
@@ -48,7 +43,8 @@ void nonRecursiveWalker() {
                 continue;
 
             if (path_push(path, &pos, entry->d_name)) {
-                fprintf(stderr, "Error opening path %s: File name too long\n", path);
+                path_pop(path, &pos);
+                fprintf(stderr, "Error opening path %s/%s: File name too long\n", path, entry->d_name);
                 break;
             }
 
@@ -70,6 +66,40 @@ void nonRecursiveWalker() {
     }
 
     while (depth) closedir(dirs[--depth]);
+}
+
+
+
+char debug_mode = 0;
+char *pattern_wf = 0;
+
+void walk_func(const char *path) {
+
+    FILE* file = fopen(path, "r");
+    if (!file) {
+        fprintf(stderr, "Error opening file %s\n", path);
+        return;
+    }
+
+    if (debug_mode) fprintf(stdout, "Searching in file %s\n", path);
+
+    char ch;
+    long pos = 0;
+    while (!feof(file)) {
+        if ((ch = getc(file)) == pattern_wf[pos]) {
+            if (!pattern_wf[++pos]) {
+                if (debug_mode) fprintf(stdout, "Match found at position %ld: ", ftell(file)-pos);
+                char *rp = realpath(path, NULL);
+                fprintf(stdout, "%s\n", rp);
+                free(rp);
+                break;
+            }
+        } else if (pos) {
+            fseek(file, -pos, 1);
+            pos = 0;
+        }
+    }
+    fclose(file);
 }
 
 
@@ -120,7 +150,7 @@ int main(int argc, char **argv) {
 
     if (getenv("LAB11DEBUG")) debug_mode = 1;
 
-    nonRecursiveWalker();
+    nonRecursiveWalker(&walk_func);
 
     return 0;
 }

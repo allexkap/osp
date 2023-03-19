@@ -83,10 +83,9 @@ void walk_func(const char *path) {
 
     if (debug_mode) fprintf(stdout, "Searching in file %s\n", path);
 
-    char ch;
     long pos = 0;
     while (!feof(file)) {
-        if ((ch = getc(file)) == pattern_wf[pos]) {
+        if (getc(file) == pattern_wf[pos]) {
             if (!pattern_wf[++pos]) {
                 if (debug_mode) fprintf(stdout, "Match found at position %ld: ", ftell(file)-pos);
                 char *rp = realpath(path, NULL);

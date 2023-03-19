@@ -71,7 +71,7 @@ void nonRecursiveWalker(void (*walk_func)(const char*)) {
 
 
 char debug_mode = 0;
-char *pattern_wf = 0;
+char *pattern_wf = NULL;
 
 void walk_func(const char *path) {
 
@@ -95,7 +95,7 @@ void walk_func(const char *path) {
                 break;
             }
         } else if (pos) {
-            fseek(file, -pos, 1);
+            fseek(file, -pos, SEEK_CUR);
             pos = 0;
         }
     }
@@ -105,19 +105,21 @@ void walk_func(const char *path) {
 
 int main(int argc, char **argv) {
 
+    if (getenv("LAB11DEBUG")) debug_mode = 1;
+
     while (1) {
         static const struct option long_options[] = {
-            {"help",    0, 0, 'h'},
-            {"version", 0, 0, 'v'},
+            {"help",    no_argument, NULL, 'h'},
+            {"version", no_argument, NULL, 'v'},
             {0, 0, 0, 0}
         };
-        switch (getopt_long(argc, argv, "hv", long_options, 0)) {
+        switch (getopt_long(argc, argv, "hv", long_options, NULL)) {
             case 'h':
                 fprintf(stdout, "help\n");
-                break;
+                return 0;
             case 'v':
                 fprintf(stdout, "version\n");
-                break;
+                return 0;
             case -1:
                 goto options_end;
             default:
@@ -147,8 +149,6 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Not enough arguments\n");
         return 1;
     }
-
-    if (getenv("LAB11DEBUG")) debug_mode = 1;
 
     nonRecursiveWalker(&walk_func);
 

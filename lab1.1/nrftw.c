@@ -64,6 +64,4 @@ void nrftw(const char *dir, void (*fn)(const char*)) {
         }
         pop(path, &pos);
     }
-
-    while (depth) closedir(dirs[--depth]);
 }

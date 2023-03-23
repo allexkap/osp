@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -Wextra -Werror
+CFLAGS=-O2 -Wall -Wextra -Werror
 LDFLAGS=
 EXECUTABLE=lab11aekN32491
 SOURCES=main.c nrftw.c
@@ -18,4 +18,4 @@ $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
-	rm -f $(OBJECTS)
+	rm -f $(EXECUTABLE) $(OBJECTS)

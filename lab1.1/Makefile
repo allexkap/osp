@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Werror
 LDFLAGS=
 EXECUTABLE=lab11aekN32491
-SOURCES=main.c
+SOURCES=main.c nrftw.c
 
 OBJECTS=$(SOURCES:.c=.o)
 
@@ -12,7 +12,7 @@ OBJECTS=$(SOURCES:.c=.o)
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $<
+	$(CC) $(LDFLAGS) -o $@ $^
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

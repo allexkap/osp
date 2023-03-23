@@ -6,4 +6,4 @@
 #include <dirent.h>
 
 
-void nrftw(void (*)(const char*));
+void nrftw(const char*, void (*)(const char*));

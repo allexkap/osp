@@ -15,16 +15,23 @@ void pop(char *path, size_t *pos) {
 }
 
 
-void nrftw(void (*walk_func)(const char*)) {
+void nrftw(const char *dir, void (*fn)(const char*)) {
 
     DIR *dirs[PATH_MAX/2];
     char path[PATH_MAX];
     size_t pos = 0, depth = 0;
     struct dirent *entry;
 
-    dirs[depth++] = opendir(".");
+    pos = strlen(dir);
+    if (pos >= PATH_MAX) {
+        fprintf(stderr, "Error opening path %s: File name too long\n", dir);
+        return;
+    }
+    strcpy(path, dir);
+
+    dirs[depth++] = opendir(path);
     if (!dirs[depth-1]) {
-        fprintf(stderr, "Error opening selected directory\n");
+        fprintf(stderr, "Error opening directory %s\n", path);
         return;
     }
 
@@ -50,7 +57,7 @@ void nrftw(void (*walk_func)(const char*)) {
                 else continue;
             }
             if (entry->d_type == DT_REG)
-                walk_func(path);
+                fn(path);
         }
         else {
             closedir(dirs[--depth]);

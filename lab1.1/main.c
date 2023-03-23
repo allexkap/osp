@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <unistd.h>
 #include <getopt.h>
 #include <stdlib.h>
 #include "nrftw.h"
@@ -63,14 +62,12 @@ int main(int argc, char **argv) {
     }
     options_end:
 
+    char *dir = NULL;
     for (int i = 1, j = 0; i < argc; ++i) {
         if (argv[i][0] == '-') continue;
         switch (j++) {
             case 0:
-                if (chdir(argv[i]) == -1) {
-                    fprintf(stderr, "Error opening directory %s\n", argv[i]);
-                    return 1;
-                }
+                dir = argv[i];
                 break;
             case 1:
                 pattern = argv[i];
@@ -85,7 +82,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    nrftw(&walk_func);
+    nrftw(dir, &walk_func);
 
     return 0;
 }

@@ -16,7 +16,7 @@ struct required_plugins {
 };
 
 
-struct required_plugins rpload(const char *dirpath) {
+struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
     struct dirent *entry;
     DIR *dir = opendir(dirpath);
@@ -72,6 +72,19 @@ struct required_plugins rpload(const char *dirpath) {
         // Подгружаем данные из плагина
         struct plugin_info ppi;
         (*plugin_get_info_ptr)(&ppi);
+
+        // Если парамер совпал с нужным -> не закрываем
+        for (int j = 1; j < argc; ++j) {
+            if (argv[j][0] != '-' || argv[j][1] != '-') continue;
+            for (size_t i = 0; i <= ppi.sup_opts_len; ++i) {
+                if (!strcmp(ppi.sup_opts[i].opt.name, argv[j]+2)) { // SIGSEGV
+                    goto dontclose;
+                }
+            }
+        }
+        dlclose(dls[--dls_pos]);
+        continue;
+        dontclose:
         opts_len += ppi.sup_opts_len;
     }
     closedir(dir);
@@ -88,9 +101,8 @@ void rpclose(struct required_plugins rp) {
 
 
 int main(int argc, char **argv) {
-    (void) argc, (void) argv;
 
-    struct required_plugins rp = rpload(".");
+    struct required_plugins rp = rpload(argc, argv, ".");
     printf("%d\n", rp.opts_len);
     rpclose(rp);
 

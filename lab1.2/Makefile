@@ -3,13 +3,15 @@ CFLAGS=-O2 -Wall -Wextra -Werror
 LDFLAGS=
 EXECUTABLE=lab12aekN32491
 SOURCES=main.c nrftw.c
+PLUGINS=libparity.c
 
 OBJECTS=$(SOURCES:.c=.o)
+SHARED=$(PLUGINS:.c=.so)
 
 .PHONY: all clean
 
 
-all: $(EXECUTABLE)
+all: $(EXECUTABLE) $(SHARED)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(LDFLAGS) -o $@ $^
@@ -17,5 +19,8 @@ $(EXECUTABLE): $(OBJECTS)
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
+%.so: %.c
+	$(CC) $(CFLAGS) -shared -fPIC -o $@ $<
+
 clean:
-	rm -f $(EXECUTABLE) $(OBJECTS)
+	rm -f $(EXECUTABLE) $(OBJECTS) $(SHARED)

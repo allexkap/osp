@@ -10,6 +10,23 @@
 
 
 
+int mode = 0b00;
+struct required_plugins rp;
+
+int run_rp(const char *path) {
+    for (int i = 0; i < rp.dls_len; ++i)
+        if ((*rp.ppfs[i])(path, rp.opts, rp.opts_len) == (mode&1))
+            return !!(mode&2);
+    return !(mode&2);
+}
+
+void walk_func(const char *path) {
+    if (run_rp(path)) printf("+");
+    else printf("-");
+    printf(" %s\n", path);
+}
+
+
 int parse_options(int argc, char **argv, const char *opts, const struct option *longopts) {
     int longindex;
     while (1) {
@@ -21,13 +38,13 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
                 printf("path = %s\n", optarg);  //?
                 break;
             case 'A':
-                printf("and\n");    //?
+                mode = 0b00;
                 break;
             case 'O':
-                printf("or\n");     //?
+                mode = 0b11;
                 break;
             case 'N':
-                printf("not\n");    //?
+                mode ^= 0b1;
                 break;
             case 'v':
                 fprintf(stdout, "version\n");
@@ -39,7 +56,6 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
                 return 0;
             default:
                 return 1;
-
         }
     }
 }
@@ -47,14 +63,14 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
 
 int main(int argc, char **argv) {
 
-    struct required_plugins rp = rpload(argc, argv, ".");
+    rp = rpload(argc, argv, ".");
 
-    if (!parse_options(argc, argv, "P:AONvh", rp.opts)) {
-        for (int i = 0; i < rp.dls_len; ++i) {
-            int (*fun)(const char*, struct option[], size_t) = dlsym(rp.dls[i], "plugin_process_file");
-            (*fun)("", rp.opts, 1);
-        }
+    if (parse_options(argc, argv, "P:AONvh", rp.opts)) {
+        rpclose(rp);
+        return 1;
     }
+
+    nrftw("example", &walk_func);
 
     rpclose(rp);
     return 0;

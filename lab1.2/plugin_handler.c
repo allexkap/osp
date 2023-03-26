@@ -85,7 +85,10 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     }
     closedir(dir);
 
-    return (struct required_plugins) {dls, dls_pos, opts, opts_pos};
+    int (**ppfs)(const char*, struct option[], size_t) = malloc(sizeof(void*) * dls_pos);
+    for (int i = 0; i < dls_pos; ++i) ppfs[i] = dlsym(dls[i], "plugin_process_file");
+
+    return (struct required_plugins) {dls, dls_pos, opts, opts_pos, ppfs};
 }
 
 
@@ -93,4 +96,5 @@ void rpclose(struct required_plugins rp) {
     for (int i = 0; i < rp.dls_len; ++i) dlclose(rp.dls[i]);
     free(rp.dls);
     free(rp.opts);
+    free(rp.ppfs);
 }

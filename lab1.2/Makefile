@@ -3,7 +3,7 @@ CFLAGS=-O2 -Wall -Wextra -Werror
 LDFLAGS=
 EXECUTABLE=lab12aekN32491
 SOURCES=main.c nrftw.c plugin_handler.c
-PLUGINS=libparity.c
+PLUGINS=libparity.c libfreq.c
 
 OBJECTS=$(SOURCES:.c=.o)
 SHARED=$(PLUGINS:.c=.so)

@@ -76,8 +76,8 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         // Если парамер совпал с нужным -> не закрываем
         for (int j = 1; j < argc; ++j) {
             if (argv[j][0] != '-' || argv[j][1] != '-') continue;
-            for (size_t i = 0; i <= ppi.sup_opts_len; ++i) {
-                if (!strcmp(ppi.sup_opts[i].opt.name, argv[j]+2)) { // SIGSEGV
+            for (size_t i = 0; i < ppi.sup_opts_len; ++i) {
+                if (!strcmp(ppi.sup_opts[i].opt.name, argv[j]+2)) {
                     goto dontclose;
                 }
             }

@@ -44,7 +44,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
         // Если ничего не открылось -> пропускаем
         if (!dls[dls_pos-1]) {
-            printf("ERROR: dlopen: %s\n", dlerror());       //?
+            printf("Error loading shared library %s\n", dlerror());
             --dls_pos;
             continue;
         }
@@ -52,7 +52,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         // Если нет функции plugin_get_info_ptr -> закрываем, пропускаем
         int (*plugin_get_info_ptr)(struct plugin_info*) = dlsym(dls[dls_pos-1], "plugin_get_info");
         if (!plugin_get_info_ptr) {
-            printf("ERROR: dlopen: %s\n", dlerror());       //?
+            printf("Error loading shared library %s\n", dlerror());
             dlclose(dls[--dls_pos]);
             continue;
         }

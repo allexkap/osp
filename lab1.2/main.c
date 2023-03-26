@@ -12,6 +12,7 @@
 struct required_plugins {
     void **dls;
     int dls_len;
+    struct option *opts;
     int opts_len;
 };
 
@@ -25,8 +26,12 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         return (struct required_plugins) {};
     }
 
-    int dls_pos = 0, dls_cap = 8, opts_len = 0;
+    int dls_pos = 0, dls_cap = 8;
     void **dls = malloc(sizeof(void*) * dls_cap);   //!
+
+    int opts_pos = 0, opts_cap = 8;
+    struct option *opts = malloc(sizeof(struct option) * opts_cap);   //!
+
 
     while (1) {
         // Считываем следующий файл
@@ -39,9 +44,8 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         if (entry->d_type != DT_REG) continue;
 
         // Если оканчивается не на .so -> пропускаем
-        int pos = 0;
-        while ((entry->d_name)[pos]) ++pos;
-        if (pos < 3 || strcmp(entry->d_name+pos-3, ".so")) continue;
+        int str_pos = strlen(entry->d_name);
+        if (str_pos < 3 || strcmp(entry->d_name+str_pos-3, ".so")) continue;
 
         // Если место под динамические библиотеки заполнено -> увеличиваем его
         if (dls_pos == dls_cap) {
@@ -85,26 +89,76 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         dlclose(dls[--dls_pos]);
         continue;
         dontclose:
-        opts_len += ppi.sup_opts_len;
+
+        // Добавляем опции плагина в общий список
+        for (size_t i = 0; i < ppi.sup_opts_len; ++i) {
+            if (opts_pos == opts_cap) {
+                opts_cap *= 2;
+                opts = realloc(opts, sizeof(struct option) * opts_cap);     //!
+            }
+            opts[opts_pos++] = ppi.sup_opts[i].opt;
+        }
     }
     closedir(dir);
 
-    return (struct required_plugins) {dls, dls_pos, opts_len};
+    return (struct required_plugins) {dls, dls_pos, opts, opts_pos};
 }
 
 
 void rpclose(struct required_plugins rp) {
     for (int i = 0; i < rp.dls_len; ++i) dlclose(rp.dls[i]);
     free(rp.dls);
+    free(rp.opts);
 }
 
+
+
+int parse_options(int argc, char **argv, const char *opts, const struct option *longopts) {
+    int longindex;
+    while (1) {
+        switch (getopt_long(argc, argv, opts, longopts, &longindex)) {
+            case 0:
+                * (char**) longopts[longindex].flag = optarg;
+                break;
+            case 'P':
+                printf("path = %s\n", optarg);  //?
+                break;
+            case 'A':
+                printf("and\n");    //?
+                break;
+            case 'O':
+                printf("or\n");     //?
+                break;
+            case 'N':
+                printf("not\n");    //?
+                break;
+            case 'v':
+                fprintf(stdout, "version\n");
+                return 1;
+            case 'h':
+                fprintf(stdout, "help\n");
+                return 1;
+            case -1:
+                return 0;
+            default:
+                return 1;
+
+        }
+    }
+}
 
 
 int main(int argc, char **argv) {
 
     struct required_plugins rp = rpload(argc, argv, ".");
-    printf("%d\n", rp.opts_len);
-    rpclose(rp);
 
+    if (!parse_options(argc, argv, "P:AONvh", rp.opts)) {
+        for (int i = 0; i < rp.dls_len; ++i) {
+            int (*fun)(const char*, struct option[], size_t) = dlsym(rp.dls[i], "plugin_process_file");
+            (*fun)("", rp.opts, 1);
+        }
+    }
+
+    rpclose(rp);
     return 0;
 }

@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-O2 -Wall -Wextra -Werror
 LDFLAGS=
 EXECUTABLE=lab12aekN32491
-SOURCES=main.c nrftw.c
+SOURCES=main.c nrftw.c plugin_handler.c
 PLUGINS=libparity.c
 
 OBJECTS=$(SOURCES:.c=.o)

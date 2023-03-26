@@ -14,15 +14,26 @@ int mode = 0b00;
 struct required_plugins rp;
 
 int run_rp(const char *path) {
-    for (int i = 0; i < rp.dls_len; ++i)
-        if ((*rp.ppfs[i])(path, rp.opts, rp.opts_len) == (mode&1))
-            return !!(mode&2);
+    for (int i = 0; i < rp.dls_len; ++i) {
+        int r = (*rp.ppfs[i])(path, rp.opts, rp.opts_len);
+        if (r == (mode&1)) return !!(mode&2);
+        if (r < 0) return -1;
+    }
     return !(mode&2);
 }
 
 void walk_func(const char *path) {
-    if (run_rp(path)) printf("+");
-    else printf("-");
+    switch (run_rp(path)) {
+        case 0:
+            printf("-");
+            break;
+        case 1:
+            printf("+");
+            break;
+        case -1:
+            printf("?");
+            break;
+    }
     printf(" %s\n", path);
 }
 

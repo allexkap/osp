@@ -22,7 +22,10 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     (void) in_opts, (void) in_opts_len; // suppress unused parameter
 
-    if (mode < 0) mode = !strcmp(arg, "evens") << 2 | !strcmp(arg, "odds") << 1 | !strcmp(arg, "eq");
+    if (mode < 0) {
+        mode = !strcmp(arg, "evens") << 2 | !strcmp(arg, "odds") << 1 | !strcmp(arg, "eq");
+        if (!mode) fprintf(stderr, "Error parsing arguments for option --parity: %s\n", arg);
+    }
 
     FILE *file = fopen(fname, "r");
     if (!file) return -1;

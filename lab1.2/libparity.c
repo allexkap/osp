@@ -1,6 +1,10 @@
+#include <stdio.h>
+#include <string.h>
 #include "plugin_api.h"
 
-char *arg;
+char *arg = NULL;
+char mode = -1;
+
 
 int plugin_get_info(struct plugin_info* ppi) {
     static struct plugin_option sup_opts[] = {
@@ -13,9 +17,29 @@ int plugin_get_info(struct plugin_info* ppi) {
     return 0;
 }
 
-#include <stdio.h>
+
 int plugin_process_file(const char *fname, struct option in_opts[], size_t in_opts_len) {
-    (void) fname, (void) in_opts, (void) in_opts_len;   // suppress unused parameter
-    printf("%s\n", arg);
-    return 0;
+
+    (void) in_opts, (void) in_opts_len; // suppress unused parameter
+
+    if (mode < 0) mode = !strcmp(arg, "evens") << 2 | !strcmp(arg, "odds") << 1 | !strcmp(arg, "eq");
+
+    FILE *file = fopen(fname, "r");
+    if (!file) return -1;
+
+    int odds = 0, evens = 0;
+    while (!feof(file)) (getc(file) % 2) ? ++odds : ++evens;
+
+    fclose(file);
+
+    switch(mode) {
+        case 1:
+            return odds == evens;
+        case 2:
+            return odds > evens;
+        case 4:
+            return odds < evens;
+        default:
+            return -1;
+    }
 }

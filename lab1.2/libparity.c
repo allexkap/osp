@@ -2,8 +2,8 @@
 #include <string.h>
 #include "plugin_api.h"
 
-char *arg = NULL;
-char mode = -1;
+static char *arg = NULL;
+static char mode = -1;
 
 
 int plugin_get_info(struct plugin_info* ppi) {

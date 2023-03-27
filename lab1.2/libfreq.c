@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include "plugin_api.h"
 
-char *arg = NULL;
-long byte = -1;
+static char *arg = NULL;
+static long byte = -1;
 
 
 int plugin_get_info(struct plugin_info* ppi) {

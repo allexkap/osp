@@ -10,16 +10,16 @@
 
 
 
-int mode = 0b00;
+int magic = 0;
 struct required_plugins rp;
 
 int run_rp(const char *path) {
     for (int i = 0; i < rp.dls_len; ++i) {
         int r = (*rp.ppfs[i])(path, rp.opts, rp.opts_len);
-        if (r == (mode&1)) return !!(mode&2);
+        if (r == (magic&1)) return !!(magic&2);
         if (r < 0) return -1;
     }
-    return !(mode&2);
+    return !(magic&2);
 }
 
 void walk_func(const char *path) {
@@ -49,13 +49,13 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
                 printf("path = %s\n", optarg);  //?
                 break;
             case 'A':
-                mode = 0b00;
+                magic &= ~3;
                 break;
             case 'O':
-                mode = 0b11;
+                magic |= 3;
                 break;
             case 'N':
-                mode ^= 0b1;
+                magic ^= 4;
                 break;
             case 'v':
                 fprintf(stdout, "version\n");
@@ -64,6 +64,7 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
                 fprintf(stdout, "help\n");
                 return 1;
             case -1:
+                if (magic&4) magic ^= 6;
                 return 0;
             default:
                 return 1;

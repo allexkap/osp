@@ -20,7 +20,7 @@ void walk_func(const char *path) {
 
     long pos = 0;
     while (!feof(file)) {
-        if (getc(file) == pattern[pos]) {
+        if (getc(file) == (unsigned char) pattern[pos]) {
             if (!pattern[++pos]) {
                 if (debug_mode) fprintf(stdout, "Match found at position %ld: ", ftell(file)-pos);
                 char *rp = realpath(path, NULL);

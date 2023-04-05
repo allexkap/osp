@@ -38,15 +38,23 @@ void walk_func(const char *path) {
 }
 
 
-int parse_options(int argc, char **argv, const char *opts, const struct option *longopts) {
+char* get_plugins_path(int argc, char **argv) {
+    int ch;
+    while ((ch = getopt(argc, argv, ":P:")) != -1)
+        if (ch == 'P') return optarg;
+    return ".";
+}
+
+
+int parse_options(int argc, char **argv, const struct option *longopts) {
     int longindex;
+    optind = 0;
     while (1) {
-        switch (getopt_long(argc, argv, opts, longopts, &longindex)) {
+        switch (getopt_long(argc, argv, "P:AONvh", longopts, &longindex)) {
             case 0:
                 * (char**) longopts[longindex].flag = optarg;
                 break;
             case 'P':
-                printf("path = %s\n", optarg);  //?
                 break;
             case 'A':
                 magic &= ~3;
@@ -75,9 +83,9 @@ int parse_options(int argc, char **argv, const char *opts, const struct option *
 
 int main(int argc, char **argv) {
 
-    rp = rpload(argc, argv, ".");
+    rp = rpload(argc, argv, get_plugins_path(argc, argv));
 
-    if (parse_options(argc, argv, "P:AONvh", rp.opts)) {
+    if (parse_options(argc, argv, rp.opts)) {
         rpclose(rp);
         return 1;
     }

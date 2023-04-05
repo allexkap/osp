@@ -24,16 +24,22 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
     (void) in_opts, (void) in_opts_len; // suppress unused parameter
 
     if (byte == -1) {
-        int base = 10;
-        if (!strncmp(arg, "0b", 2)) base = 2;
-        if (!strncmp(arg, "0x", 2)) base = 16;
-
-        char *endptr;
-        byte = strtol(base!=10 ? arg+2 : arg, &endptr, base);
-
-        if (!*arg || *endptr || byte > 255 || byte < 0) {
-            fprintf(stderr, "Error parsing arguments for option --freq-byte: %s\n", arg);
+        if (!arg) {
+            fprintf(stderr, "Error parsing arguments for option --freq-byte: Argument not found");
             byte = -2;
+        }
+        else {
+            int base = 10;
+            if (!strncmp(arg, "0b", 2)) base = 2;
+            if (!strncmp(arg, "0x", 2)) base = 16;
+
+            char *endptr;
+            byte = strtol(base!=10 ? arg+2 : arg, &endptr, base);
+
+            if (!*arg || *endptr || byte > 255 || byte < 0) {
+                fprintf(stderr, "Error parsing arguments for option --freq-byte: %s\n", arg);
+                byte = -2;
+            }
         }
     }
     if (byte < 0) return -1;
@@ -45,7 +51,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
     }
 
     int bytes[256] = {};
-    while (!feof(file)) ++bytes[(unsigned char) getc(file)];
+    while (!feof(file)) ++bytes[getc(file)];
 
     fclose(file);
 

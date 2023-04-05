@@ -23,10 +23,16 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
     (void) in_opts, (void) in_opts_len; // suppress unused parameter
 
     if (mode == -1) {
-        mode = !strcmp(arg, "evens") << 2 | !strcmp(arg, "odds") << 1 | !strcmp(arg, "eq");
-        if (!mode) {
-            fprintf(stderr, "Error parsing arguments for option --parity: %s\n", arg);
+        if (!arg) {
+            fprintf(stderr, "Error parsing arguments for option --parity: Argument not found");
             mode = -2;
+        }
+        else {
+            mode = !strcmp(arg, "evens") << 2 | !strcmp(arg, "odds") << 1 | !strcmp(arg, "eq");
+            if (!mode) {
+                fprintf(stderr, "Error parsing arguments for option --parity: %s\n", arg);
+                mode = -2;
+            }
         }
     }
     if (mode < 0) return -1;

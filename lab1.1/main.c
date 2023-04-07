@@ -49,10 +49,10 @@ int main(int argc, char **argv) {
         };
         switch (getopt_long(argc, argv, "hv", long_options, NULL)) {
             case 'h':
-                fprintf(stdout, "help\n");
+                fprintf(stdout, "Usage: ./prog [options] directory target\n");
                 return 0;
             case 'v':
-                fprintf(stdout, "version\n");
+                fprintf(stdout, "Version 0.34\n");
                 return 0;
             case -1:
                 goto options_end;

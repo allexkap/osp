@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-O2 -Wall -Wextra -Werror
-LDFLAGS=
+LDFLAGS=-ldl
 EXECUTABLE=lab12aekN32491
 SOURCES=main.c nrftw.c plugin_handler.c
 PLUGINS=libparity.c libfreq.c

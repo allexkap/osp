@@ -5,6 +5,7 @@
 #include <dirent.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include "xalloc.h"
 #include "plugin_api.h"
 
 

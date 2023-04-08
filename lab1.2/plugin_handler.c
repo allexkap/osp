@@ -11,10 +11,10 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     }
 
     int dls_pos = 0, dls_cap = 8;
-    void **dls = malloc(sizeof(void*) * dls_cap);   //!
+    void **dls = xmalloc(sizeof(void*) * dls_cap);
 
     int opts_pos = 0, opts_cap = 8;
-    struct option *opts = malloc(sizeof(struct option) * opts_cap);   //!
+    struct option *opts = xmalloc(sizeof(struct option) * opts_cap);
 
 
     while (1) {
@@ -34,7 +34,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         // Если место под динамические библиотеки заполнено -> увеличиваем его
         if (dls_pos == dls_cap) {
             dls_cap *= 2;
-            dls = realloc(dls, sizeof(void*) * dls_cap);    //!
+            dls = xrealloc(dls, sizeof(void*) * dls_cap);
         }
 
         // Открываем библиотеку
@@ -78,14 +78,14 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         for (size_t i = 0; i < ppi.sup_opts_len; ++i) {
             if (opts_pos == opts_cap) {
                 opts_cap *= 2;
-                opts = realloc(opts, sizeof(struct option) * opts_cap);     //!
+                opts = xrealloc(opts, sizeof(struct option) * opts_cap);
             }
             opts[opts_pos++] = ppi.sup_opts[i].opt;
         }
     }
     closedir(dir);
 
-    int (**ppfs)(const char*, struct option[], size_t) = malloc(sizeof(void*) * dls_pos);
+    int (**ppfs)(const char*, struct option[], size_t) = xmalloc(sizeof(void*) * dls_pos);
     for (int i = 0; i < dls_pos; ++i) ppfs[i] = dlsym(dls[i], "plugin_process_file");
 
     return (struct required_plugins) {dls, dls_pos, opts, opts_pos, ppfs};

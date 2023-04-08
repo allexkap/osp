@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-O2 -Wall -Wextra -Werror
 LDFLAGS=-ldl
 EXECUTABLE=lab12aekN32491
-SOURCES=main.c nrftw.c plugin_handler.c
+SOURCES=main.c nrftw.c plugin_handler.c xalloc.c
 PLUGINS=libparity.c libfreq.c
 
 OBJECTS=$(SOURCES:.c=.o)

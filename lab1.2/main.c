@@ -39,16 +39,15 @@ void walk_func(const char *path) {
 
 
 char* get_plugins_path(int argc, char **argv) {
-    int ch;
-    while ((ch = getopt(argc, argv, ":P:")) != -1)
-        if (ch == 'P') return optarg;
+    for (int i = 0; i < argc-1; ++i)
+        if (argv[i][0] == '-' && argv[i][1] == 'P' && argv[i][2] == '\0')
+            return argv[i+1];
     return ".";
 }
 
 
 int parse_options(int argc, char **argv, const struct option *longopts) {
     int longindex;
-    optind = 0;
     while (1) {
         switch (getopt_long(argc, argv, "P:AONvh", longopts, &longindex)) {
             case 0:
@@ -90,7 +89,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    nrftw("example", &walk_func);
+    nrftw((optind != argc) ? argv[optind] : "." , &walk_func);
 
     rpclose(rp);
     return 0;

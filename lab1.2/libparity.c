@@ -24,7 +24,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     if (mode == -1) {
         if (!arg) {
-            fprintf(stderr, "Error parsing arguments for option --parity: Argument not found");
+            fprintf(stderr, "Error parsing arguments for option --parity: Argument not found\n");
             mode = -2;
         }
         else {

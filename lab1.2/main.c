@@ -10,16 +10,14 @@
 
 
 
-int magic = 0;
+int or = 0, not = 0;
 struct required_plugins rp;
 
 int run_rp(const char *path) {
-    for (int i = 0; i < rp.dls_len; ++i) {
-        int r = (*rp.ppfs[i])(path, rp.opts, rp.opts_len);
-        if (r == (magic&1)) return !!(magic&2);
-        if (r < 0) return -1;
-    }
-    return !(magic&2);
+    int ok = 0, r = 0;
+    for (int i = 0; i < rp.dls_len; ++i)
+        if (ok += (r = (*rp.ppfs[i])(path, rp.opts, rp.opts_len)), r < 0) return r;
+    return not ^ (ok&&ok-rp.dls_len?or:!!ok);
 }
 
 void walk_func(const char *path) {
@@ -56,13 +54,13 @@ int parse_options(int argc, char **argv, const struct option *longopts) {
             case 'P':
                 break;
             case 'A':
-                magic &= ~3;
+                or = 0;
                 break;
             case 'O':
-                magic |= 3;
+                or = 1;
                 break;
             case 'N':
-                magic ^= 4;
+                not ^= 1;
                 break;
             case 'v':
                 fprintf(stdout, "version\n");
@@ -71,7 +69,6 @@ int parse_options(int argc, char **argv, const struct option *longopts) {
                 fprintf(stdout, "help\n");
                 return 1;
             case -1:
-                if (magic&4) magic ^= 6;
                 return 0;
             default:
                 return 1;

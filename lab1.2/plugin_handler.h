@@ -4,6 +4,7 @@
 #include <string.h>
 #include <dirent.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <dlfcn.h>
 #include "xalloc.h"
 #include "plugin_api.h"

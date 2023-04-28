@@ -17,6 +17,10 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     struct option *opts = xmalloc(sizeof(struct option) * opts_cap);
 
 
+    // Временно меняем директорию для корректной работы realpath
+    char *cwd = getcwd(NULL, 0);
+    chdir(dirpath);
+
     while (1) {
         // Считываем следующий файл
         entry = readdir(dir);
@@ -84,6 +88,9 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         }
     }
     closedir(dir);
+
+    chdir(cwd);
+    free(cwd);
 
     int (**ppfs)(const char*, struct option[], size_t) = xmalloc(sizeof(void*) * dls_pos);
     for (int i = 0; i < dls_pos; ++i) ppfs[i] = dlsym(dls[i], "plugin_process_file");

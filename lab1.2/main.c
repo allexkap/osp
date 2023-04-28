@@ -38,9 +38,12 @@ void walk_func(const char *path) {
 
 char* get_plugins_path(int argc, char **argv) {
     for (int i = 0; i < argc-1; ++i)
-        if (argv[i][0] == '-' && argv[i][1] == 'P' && argv[i][2] == '\0')
+        if (!strcmp(argv[i], "-P"))
             return argv[i+1];
-    return ".";
+    int p = 0;
+    for (int i = 0; argv[0][i]; ++i) if (argv[0][i] == '/') p = i;
+    argv[0][p] = 0;
+    return argv[0];
 }
 
 

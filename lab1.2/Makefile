@@ -14,7 +14,7 @@ SHARED=$(PLUGINS:.c=.so)
 all: $(EXECUTABLE) $(SHARED)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) -o $@ $^
+	$(CC) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -65,6 +65,14 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         struct plugin_info ppi;
         (*plugin_get_info_ptr)(&ppi);
 
+        // Демонстрационный режим
+        if (!argc) {
+            printf("\nPlugin:  %s\nPurpose: %s\nAuthor:  %s\nOptions:\n",
+                entry->d_name, ppi.plugin_purpose, ppi.plugin_author);
+            for (size_t i = 0; i < ppi.sup_opts_len; ++i)
+                printf("\t%s:\t%s\n", ppi.sup_opts[i].opt.name, ppi.sup_opts[i].opt_descr);
+        }
+
         // Если парамер совпал с нужным -> не закрываем
         for (int j = 1; j < argc; ++j) {
             if (argv[j][0] != '-' || argv[j][1] != '-') continue;

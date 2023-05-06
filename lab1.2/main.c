@@ -41,7 +41,7 @@ char* get_plugins_path(int argc, char **argv) {
         if (!strcmp(argv[i], "-P"))
             return argv[i+1];
     int p = 0;
-    for (int i = 0; argv[0][i]; ++i) if (argv[0][i] == '/') p = i;
+    for (int i = 0; argv[0][i]; ++i) if (argv[0][i] == '/') p = i+1;
     argv[0][p] = 0;
     return argv[0];
 }
@@ -89,7 +89,14 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    nrftw((optind != argc) ? argv[optind] : "." , &walk_func);
+    if (optind == argc) {
+        fprintf(stdout, "List of all available plugins:\n");
+        rpclose(rp);
+        rpclose(rpload(0, argv, get_plugins_path(argc, argv)));
+        return 0;
+    }
+
+    nrftw(argv[optind], &walk_func);
 
     rpclose(rp);
     return 0;

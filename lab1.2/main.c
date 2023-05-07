@@ -10,6 +10,7 @@
 
 
 
+int debug_mode = 0;
 int or = 0, not = 0;
 struct required_plugins rp;
 
@@ -21,18 +22,16 @@ int run_rp(const char *path) {
 }
 
 void walk_func(const char *path) {
-    switch (run_rp(path)) {
-        case 0:
-            printf("-");
-            break;
-        case 1:
-            printf("+");
-            break;
-        case -1:
-            printf("?");
-            break;
+    int r = run_rp(path);
+    if (debug_mode) {
+        r = r > 0 ? 1 : r < 0 ? 2 : 0;
+        printf("%c %s\n", "-+?"[r], path);
     }
-    printf(" %s\n", path);
+    else if (r > 0) {
+        char *rp = realpath(path, NULL);
+        fprintf(stdout, "%s\n", rp);
+        free(rp);
+    }
 }
 
 
@@ -84,6 +83,8 @@ int parse_options(int argc, char **argv, struct option *longopts) {
 
 
 int main(int argc, char **argv) {
+
+    if (getenv("LAB1DEBUG")) debug_mode = 1;
 
     rp = rpload(argc, argv, get_plugins_path(argc, argv));
 

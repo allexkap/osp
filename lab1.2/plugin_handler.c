@@ -51,7 +51,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
         // Если ничего не открылось -> пропускаем
         if (!dls[dls_pos-1]) {
-            printf("Error loading shared library %s\n", dlerror());
+            fprintf(stderr, "Error loading shared library %s\n", dlerror());
             --dls_pos;
             continue;
         }
@@ -59,7 +59,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         // Если нет функции plugin_get_info_ptr -> закрываем, пропускаем
         int (*plugin_get_info_ptr)(struct plugin_info*) = dlsym(dls[dls_pos-1], "plugin_get_info");
         if (!plugin_get_info_ptr) {
-            printf("Error loading shared library %s\n", dlerror());
+            fprintf(stderr, "Error loading shared library %s\n", dlerror());
             dlclose(dls[--dls_pos]);
             continue;
         }
@@ -70,10 +70,10 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
         // Демонстрационный режим
         if (!argc) {
-            printf("\nPlugin:  %s\nPurpose: %s\nAuthor:  %s\nOptions:\n",
+            fprintf(stdout, "\nPlugin:  %s\nPurpose: %s\nAuthor:  %s\nOptions:\n",
                 entry->d_name, ppi.plugin_purpose, ppi.plugin_author);
             for (size_t i = 0; i < ppi.sup_opts_len; ++i)
-                printf("\t%s:\t%s\n", ppi.sup_opts[i].opt.name, ppi.sup_opts[i].opt_descr);
+                fprintf(stdout, "\t%s:\t%s\n", ppi.sup_opts[i].opt.name, ppi.sup_opts[i].opt_descr);
         }
 
         // Если парамер совпал с нужным -> не закрываем

@@ -28,7 +28,7 @@ void walk_func(const char *path) {
     int r = run_rp(path);
     if (debug_mode) {
         r = r > 0 ? 1 : r < 0 ? 2 : 0;
-        printf("%c %s\n", "-+?"[r], path);
+        fprintf(stdout, "%c %s\n", "-+?"[r], path);
     }
     else if (r > 0) {
         char *rp = realpath(path, NULL);

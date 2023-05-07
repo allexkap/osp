@@ -68,10 +68,10 @@ int parse_options(int argc, char **argv, struct option *longopts) {
                 not ^= 1;
                 break;
             case 'v':
-                fprintf(stdout, "version\n");
+                fprintf(stdout, "Version 0.34\n");
                 return 1;
             case 'h':
-                fprintf(stdout, "help\n");
+                fprintf(stdout, "Usage: ./prog [options] directory\n");
                 return 1;
             case -1:
                 return 0;

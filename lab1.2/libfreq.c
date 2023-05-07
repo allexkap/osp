@@ -9,10 +9,10 @@ static long byte = -1;
 
 int plugin_get_info(struct plugin_info* ppi) {
     static struct plugin_option sup_opts[] = {
-        {{"freq-byte", required_argument, (int*) &arg, 0}, "description"},
+        {{"freq-byte", required_argument, (int*) &arg, 0}, "value in bin, dec or hex"},
     };
-    ppi->plugin_purpose = "purpose";
-    ppi->plugin_author = "author";
+    ppi->plugin_purpose = "Check if the given byte is the most frequent";
+    ppi->plugin_author = "allexkap";
     ppi->sup_opts_len = 1;
     ppi->sup_opts = sup_opts;
     return 0;

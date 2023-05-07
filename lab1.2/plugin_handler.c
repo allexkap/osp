@@ -45,8 +45,8 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         }
 
         // Открываем библиотеку
-        char *path = realpath(entry->d_name, NULL);         //!
-        dls[dls_pos++] = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
+        char *path = realpath(entry->d_name, NULL);
+        dls[dls_pos++] = dlopen(path, RTLD_NOW);
         free(path);
 
         // Если ничего не открылось -> пропускаем

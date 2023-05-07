@@ -15,6 +15,8 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
     int opts_pos = 0, opts_cap = 8;
     struct option *opts = xmalloc(sizeof(struct option) * opts_cap);
+    int *opts_offsets = xmalloc(sizeof(int) * (dls_cap+1));
+    opts_offsets[0] = 0;
 
 
     // Временно меняем директорию для корректной работы realpath
@@ -39,6 +41,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         if (dls_pos == dls_cap) {
             dls_cap *= 2;
             dls = xrealloc(dls, sizeof(void*) * dls_cap);
+            opts_offsets = xrealloc(opts_offsets, sizeof(int) * (dls_cap+1));
         }
 
         // Открываем библиотеку
@@ -87,12 +90,13 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
         dontclose:
 
         // Добавляем опции плагина в общий список
+        opts_offsets[dls_pos] = opts_offsets[dls_pos-1] + ppi.sup_opts_len;
         for (size_t i = 0; i < ppi.sup_opts_len; ++i) {
+            opts[opts_pos++] = ppi.sup_opts[i].opt;
             if (opts_pos == opts_cap) {
                 opts_cap *= 2;
                 opts = xrealloc(opts, sizeof(struct option) * opts_cap);
             }
-            opts[opts_pos++] = ppi.sup_opts[i].opt;
         }
     }
     closedir(dir);
@@ -100,10 +104,12 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     chdir(cwd);
     free(cwd);
 
+    opts[opts_pos] = (struct option) {0, 0, 0, 0};
+
     int (**ppfs)(const char*, struct option[], size_t) = xmalloc(sizeof(void*) * dls_pos);
     for (int i = 0; i < dls_pos; ++i) ppfs[i] = dlsym(dls[i], "plugin_process_file");
 
-    return (struct required_plugins) {dls, dls_pos, opts, opts_pos, ppfs};
+    return (struct required_plugins) {dls, dls_pos, opts, opts_offsets, ppfs};
 }
 
 
@@ -111,5 +117,6 @@ void rpclose(struct required_plugins rp) {
     for (int i = 0; i < rp.dls_len; ++i) dlclose(rp.dls[i]);
     free(rp.dls);
     free(rp.opts);
+    free(rp.opts_pos);
     free(rp.ppfs);
 }

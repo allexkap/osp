@@ -14,7 +14,7 @@ struct required_plugins {
     void **dls;
     int dls_len;
     struct option *opts;
-    int opts_len;
+    int *opts_pos;
     int (**ppfs)(const char*, struct option[], size_t);
 };
 

@@ -21,9 +21,10 @@ int plugin_get_info(struct plugin_info* ppi) {
 
 int plugin_process_file(const char *fname, struct option in_opts[], size_t in_opts_len) {
 
-    (void) in_opts, (void) in_opts_len; // suppress unused parameter
-
     if (byte == -1) {
+        for (size_t i = 0; !arg && i < in_opts_len; ++i)
+            if (!strcmp(in_opts[i].name, "parity"))
+                arg = (char*)in_opts[i].flag;
         if (!arg) {
             fprintf(stderr, "Error parsing arguments for option --freq-byte: Argument not found\n");
             byte = -2;

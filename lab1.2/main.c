@@ -16,7 +16,7 @@ struct required_plugins rp;
 int run_rp(const char *path) {
     int ok = 0, r = 0;
     for (int i = 0; i < rp.dls_len; ++i)
-        if (ok += (r = (*rp.ppfs[i])(path, rp.opts, rp.opts_len)), r < 0) return r;
+        if (ok += r = (*rp.ppfs[i])(path, &rp.opts[rp.opts_pos[i]], rp.opts_pos[i+1] - rp.opts_pos[i]), r < 0) return r;
     return not ^ (ok&&ok-rp.dls_len?or:!!ok);
 }
 
@@ -47,12 +47,15 @@ char* get_plugins_path(int argc, char **argv) {
 }
 
 
-int parse_options(int argc, char **argv, const struct option *longopts) {
+int parse_options(int argc, char **argv, struct option *longopts) {
     int longindex;
     while (1) {
         switch (getopt_long(argc, argv, "P:AONvh", longopts, &longindex)) {
             case 0:
-                * (char**) longopts[longindex].flag = optarg;
+                if (longopts[longindex].flag)
+                    * (char**) longopts[longindex].flag = optarg;
+                else
+                    longopts[longindex].flag = (int*) optarg;
                 break;
             case 'P':
                 break;
@@ -95,6 +98,9 @@ int main(int argc, char **argv) {
         rpclose(rpload(0, argv, get_plugins_path(argc, argv)));
         return 0;
     }
+
+    for (int i = 0; i < rp.opts_pos[rp.dls_len]; ++i)
+        if (!rp.opts[i].flag) rp.opts[i].flag = (int*) "";
 
     nrftw(argv[optind], &walk_func);
 

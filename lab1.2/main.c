@@ -32,7 +32,8 @@ void walk_func(const char *path) {
     }
     else if (r > 0) {
         char *rp = realpath(path, NULL);
-        fprintf(stdout, "%s\n", rp);
+        if (rp) fprintf(stdout, "%s\n", rp);
+        else fprintf(stderr, "Error getting real path to file %s\n", path);
         free(rp);
     }
 }
@@ -90,6 +91,11 @@ int main(int argc, char **argv) {
     if (getenv("LAB1DEBUG")) debug_mode = 1;
 
     rp = rpload(argc, argv, get_plugins_path(argc, argv));
+
+    if (!rp.dls) {
+        rpclose(rp);
+        return 1;
+    }
 
     if (parse_options(argc, argv, rp.opts)) {
         rpclose(rp);

@@ -4,8 +4,12 @@
 struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
 
     struct dirent *entry;
-    DIR *dir = opendir(dirpath);
-    if (!dir) {
+    char *cwd = getcwd(NULL, 0);
+    DIR *dir = opendir(".");
+
+    if (!cwd || chdir(dirpath) || !dir) {
+        if (dir) closedir(dir);
+        free(cwd);
         fprintf(stderr, "Error opening selected directory %s\n", dirpath);
         return (struct required_plugins) {};
     }
@@ -18,10 +22,6 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     int *opts_offsets = xmalloc(sizeof(int) * (dls_cap+1));
     opts_offsets[0] = 0;
 
-
-    // Временно меняем директорию для корректной работы realpath
-    char *cwd = getcwd(NULL, 0);
-    chdir(dirpath);
 
     while (1) {
         // Считываем следующий файл
@@ -104,7 +104,7 @@ struct required_plugins rpload(int argc, char **argv, const char *dirpath) {
     chdir(cwd);
     free(cwd);
 
-    opts[opts_pos] = (struct option) {0, 0, 0, 0};
+    opts[opts_pos] = (struct option) {};
 
     int (**ppfs)(const char*, struct option[], size_t) = xmalloc(sizeof(void*) * dls_pos);
     for (int i = 0; i < dls_pos; ++i) ppfs[i] = dlsym(dls[i], "plugin_process_file");

@@ -11,13 +11,16 @@
 
 
 int debug_mode = 0;
-int or = 0, not = 1;    // tmp fix
+int or = 0, not = 0;
 struct required_plugins rp;
 
 int run_rp(const char *path) {
     int ok = 0, r = 0;
-    for (int i = 0; i < rp.dls_len; ++i)
-        if (ok += r = (*rp.ppfs[i])(path, &rp.opts[rp.opts_pos[i]], rp.opts_pos[i+1] - rp.opts_pos[i]), r < 0) return r;
+    for (int i = 0; i < rp.dls_len; ++i) {
+        r = (*rp.ppfs[i])(path, &rp.opts[rp.opts_pos[i]], rp.opts_pos[i+1] - rp.opts_pos[i]);
+        if (r < 0) return r;
+        if (!r) ok += 1;
+    }
     return not ^ (ok&&ok-rp.dls_len?or:!!ok);
 }
 

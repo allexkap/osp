@@ -11,7 +11,7 @@
 
 
 int debug_mode = 0;
-int or = 0, not = 0;
+int or = 0, not = 1;    // tmp fix
 struct required_plugins rp;
 
 int run_rp(const char *path) {

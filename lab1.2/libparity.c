@@ -51,11 +51,11 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     switch(mode) {
         case 1:
-            return odds == evens;
+            return odds != evens;
         case 2:
-            return odds > evens;
+            return odds <= evens;
         case 4:
-            return odds < evens;
+            return odds >= evens;
         default:
             return -1;
     }

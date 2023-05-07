@@ -56,6 +56,6 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     fclose(file);
 
-    for (int i = 0; i < 256; ++i) if (bytes[byte] < bytes[i] && byte != i) return 0;
-    return 1;
+    for (int i = 0; i < 256; ++i) if (bytes[byte] < bytes[i] && byte != i) return 1;
+    return 0;
 }

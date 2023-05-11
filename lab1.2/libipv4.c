@@ -36,24 +36,18 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
             state = -1;
         }
         else {
+            arglen = strlen(arg);
             long byte;
-            uint32_t ipv4_bin = 0;
             char *ptr = arg, *endptr = NULL;
             for (state = 0; state < 4; ++state) {
                 byte = strtol(ptr, &endptr, 10);
-                if (byte > 255 || byte < 0 || ptr == endptr || ptr - endptr > 3) break;
+                if (byte > 255 || byte < 0 || ptr == endptr || (endptr - ptr > 1 && *ptr == '0')) break;
                 ptr = endptr + (*endptr == '.');
-                ipv4_bin <<= 8;
-                ipv4_bin += byte;
+                argbin[state] = byte;
             }
             if (state != 4 || *endptr) {
                 fprintf(stderr, "Error parsing arguments for option --ipv4-addr: %s\n", arg);
                 state = -1;
-            }
-            else {
-                arglen = strlen(arg);
-                // * (uint32_t*) argbin = ipv4_bin;
-                for (int i = 0; i < 4; ++i) argbin[i] = ipv4_bin >> 8*(3-i);
             }
         }
     }
@@ -75,7 +69,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
         goto end;
     }
 
-    ptr = mmap(0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    ptr = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (ptr == MAP_FAILED) {
         goto end;
     }

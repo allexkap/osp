@@ -15,10 +15,10 @@ static int state = 0;
 
 int plugin_get_info(struct plugin_info* ppi) {
     static struct plugin_option sup_opts[] = {
-        {{"ipv4-addr", required_argument, (int*) &arg, 0}, "description"},
+        {{"ipv4-addr", required_argument, (int*) &arg, 0}, "like x.x.x.x"},
     };
-    ppi->plugin_purpose = "purpose";
-    ppi->plugin_author = "author";
+    ppi->plugin_purpose = "Check if the given IPv4 contains in a file in text or binary form";
+    ppi->plugin_author = "allexkap";
     ppi->sup_opts_len = 1;
     ppi->sup_opts = sup_opts;
     return 0;

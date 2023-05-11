@@ -62,6 +62,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     int fd = open(fname, O_RDONLY);
     if (fd < 0) {
+        fprintf(stderr, "Error opening file %s\n", fname);
         return -1;
     }
 
@@ -90,5 +91,6 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
     end:
     close(fd);
     if (ptr && ptr != MAP_FAILED) munmap(ptr, st.st_size);
+    if (exit_code < 0) fprintf(stderr, "Unknown error with file %s\n", fname);
     return exit_code;
 }

@@ -8,9 +8,8 @@
 #include <sys/mman.h>
 #include "plugin_api.h"
 
-static char *arg = NULL;
+static char *arg = NULL, argbin[4] = {};
 static size_t arglen = 0;
-static uint32_t ipv4_bin = 0;
 static int state = 0;
 
 
@@ -37,8 +36,8 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
             state = -1;
         }
         else {
-            arglen = strlen(arg);
             long byte;
+            uint32_t ipv4_bin = 0;
             char *ptr = arg, *endptr = NULL;
             for (state = 0; state < 4; ++state) {
                 byte = strtol(ptr, &endptr, 10);
@@ -50,6 +49,11 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
             if (state != 4 || *endptr) {
                 fprintf(stderr, "Error parsing arguments for option --ipv4-addr: %s\n", arg);
                 state = -1;
+            }
+            else {
+                arglen = strlen(arg);
+                // * (uint32_t*) argbin = ipv4_bin;
+                for (int i = 0; i < 4; ++i) argbin[i] = ipv4_bin >> 8*(3-i);
             }
         }
     }
@@ -76,7 +80,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
     }
 
     for (int i = 0; i < st.st_size; ++i) {
-        if (!strncmp(ptr+i, arg, arglen) || (st.st_size-i >= 4 && *(uint32_t*)(ptr+i) == ipv4_bin)) {
+        if (!strncmp(ptr+i, arg, arglen) || !strncmp(ptr+i, argbin, 4)) {
             exit_code = 0;
             goto end;
         }
@@ -85,6 +89,6 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     end:
     close(fd);
-    munmap(ptr, st.st_size);
+    if (ptr && ptr != MAP_FAILED) munmap(ptr, st.st_size);
     return exit_code;
 }

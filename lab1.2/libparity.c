@@ -10,7 +10,7 @@ int plugin_get_info(struct plugin_info* ppi) {
     static struct plugin_option sup_opts[] = {
         {{"parity", required_argument, (int*) &arg, 0}, "evens, odds or eq"},
     };
-    ppi->plugin_purpose = "Check which bytes are frequent";
+    ppi->plugin_purpose = "Check which bytes are the most frequent";
     ppi->plugin_author = "allexkap";
     ppi->sup_opts_len = 1;
     ppi->sup_opts = sup_opts;

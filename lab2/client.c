@@ -25,9 +25,6 @@ int main() {
     client_socket = socket(AF_INET, SOCK_DGRAM, 0);
     pcheck(client_socket, "socket failed");
 
-    res = setsockopt(client_socket, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
-    pcheck(res, "setsockopt");
-
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(25552);
     server_address.sin_addr.s_addr = inet_addr("127.0.0.1");

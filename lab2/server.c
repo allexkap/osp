@@ -12,6 +12,14 @@
 
 
 
+int debug_mode = 0, demon_mode = 0;
+int wait_time = 0;
+char *log_path = "/tmp/lab2.log";
+
+char *server_ip = "127.0.0.1";
+short server_port = 25552;
+
+
 void remove_child(int) {
     wait(NULL);
 }
@@ -30,9 +38,51 @@ void worker(char* buffer) {
 }
 
 
-int main() {
+int parse_params(int argc, char **argv) {
+    char *r;
+    if (r = getenv("LAB2WAIT"))     wait_time = atoi(r);
+    if (r = getenv("LAB2LOGFILE"))  log_path = r;
+    if (r = getenv("LAB2ADDR"))     server_ip = r;
+    if (r = getenv("LAB2PORT"))     server_port = atoi(r);
+    if (r = getenv("LAB2DEBUG"))    debug_mode = 1;
 
-    int demon_mode = 0;
+    while (1) {
+        switch (getopt(argc, argv, "w:l:a:p:dvh")) {
+            case 'w':
+                wait_time = atoi(optarg);
+                break;
+            case 'l':
+                log_path = optarg;
+                break;
+            case 'a':
+                server_ip = optarg;
+                break;
+            case 'p':
+                server_port = atoi(optarg);
+                break;
+            case 'd':
+                demon_mode = 1;
+                break;
+            case 'v':
+                fprintf(stdout, "version\n");
+                return 1;
+            case 'h':
+                fprintf(stdout, "help\n");
+                return 1;
+            case -1:
+                return 0;
+            default:
+                return 1;
+        }
+    }
+}
+
+
+int main(int argc, char **argv) {
+
+    if (parse_params(argc, argv)) {
+        return 1;
+    }
 
     if (demon_mode && fork()) return 0;
 
@@ -47,8 +97,8 @@ int main() {
     pcheck(res, "setsockopt");
 
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(25552);
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_address.sin_port = htons(server_port);
+    server_address.sin_addr.s_addr = inet_addr(server_ip);
 
     res = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
     pcheck(res, "bind");

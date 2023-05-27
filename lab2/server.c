@@ -32,6 +32,10 @@ void worker(char* buffer) {
 
 int main() {
 
+    int demon_mode = 0;
+
+    if (demon_mode && fork()) return 0;
+
     int res;
     int server_socket;
     struct sockaddr_in server_address, client_address;

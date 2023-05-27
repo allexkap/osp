@@ -2,12 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
+#include <sys/wait.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
 #define BUFFER_SIZE 1024
 
+
+
+void remove_child(int) {
+    wait(NULL);
+}
 
 
 void pcheck(int res, char *msg) {
@@ -41,6 +48,8 @@ int main() {
 
     res = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
     pcheck(res, "bind");
+
+    signal(SIGCHLD, remove_child);
 
 
     char buffer[BUFFER_SIZE] = {};

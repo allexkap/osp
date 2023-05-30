@@ -35,7 +35,7 @@ void pcheck(int res, char *msg) {
 
 void worker(char* buffer) {
     for (int i = 0; buffer[i]; ++i) buffer[i] |= 32;
-    sleep(4);
+    sleep(wait_time);
 }
 
 

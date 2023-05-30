@@ -5,6 +5,7 @@
 #include <signal.h>
 #include <sys/wait.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -40,11 +41,11 @@ void worker(char* buffer) {
 
 int parse_params(int argc, char **argv) {
     char *r;
-    if (r = getenv("LAB2WAIT"))     wait_time = atoi(r);
-    if (r = getenv("LAB2LOGFILE"))  log_path = r;
-    if (r = getenv("LAB2ADDR"))     server_ip = r;
-    if (r = getenv("LAB2PORT"))     server_port = atoi(r);
-    if (r = getenv("LAB2DEBUG"))    debug_mode = 1;
+    if ((r = getenv("LAB2WAIT")))    wait_time = atoi(r);
+    if ((r = getenv("LAB2LOGFILE"))) log_path = r;
+    if ((r = getenv("LAB2ADDR")))    server_ip = r;
+    if ((r = getenv("LAB2PORT")))    server_port = atoi(r);
+    if ((r = getenv("LAB2DEBUG")))   debug_mode = 1;
 
     while (1) {
         switch (getopt(argc, argv, "w:l:a:p:dvh")) {
@@ -109,7 +110,7 @@ int main(int argc, char **argv) {
     char buffer[BUFFER_SIZE] = {};
     while (1) {
         res = recvfrom(server_socket, buffer, sizeof(buffer), 0,
-            (struct sockaddr*) &client_address, &(int){sizeof(client_address)});
+            (struct sockaddr*) &client_address, (socklen_t*)&(int){sizeof(client_address)});
         if (!fork()) break;
     }
 

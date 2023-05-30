@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
@@ -25,9 +26,9 @@ void pcheck(int res, char *msg) {
 
 int parse_params(int argc, char **argv) {
     char *r;
-    if (r = getenv("LAB2ADDR"))     server_ip = r;
-    if (r = getenv("LAB2PORT"))     server_port = atoi(r);
-    if (r = getenv("LAB2DEBUG"))    debug_mode = 1;
+    if ((r = getenv("LAB2ADDR")))  server_ip = r;
+    if ((r = getenv("LAB2PORT")))  server_port = atoi(r);
+    if ((r = getenv("LAB2DEBUG"))) debug_mode = 1;
 
     while (1) {
         switch (getopt(argc, argv, "a:p:vh")) {
@@ -60,7 +61,7 @@ int main(int argc, char **argv) {
 
     int res;
     int client_socket;
-    struct sockaddr_in server_address, client_address;
+    struct sockaddr_in server_address;
 
     client_socket = socket(AF_INET, SOCK_DGRAM, 0);
     pcheck(client_socket, "socket failed");
@@ -69,13 +70,14 @@ int main(int argc, char **argv) {
     server_address.sin_port = htons(server_port);
     server_address.sin_addr.s_addr = inet_addr(server_ip);
 
+    res = connect(client_socket, (struct sockaddr*) &server_address, sizeof(server_address));
+    pcheck(res, "connect");
+
 
     char buffer[BUFFER_SIZE] = "NIT HEH";
-    res = sendto(client_socket, buffer, strlen(buffer), 0,
-        (struct sockaddr*) &server_address, sizeof(server_address));
-    res = recvfrom(client_socket, buffer, sizeof(buffer), 0,
-        (struct sockaddr*) &server_address, &(int){sizeof(server_address)});
-
+    res = send(client_socket, buffer, strlen(buffer), 0);
+    res = recv(client_socket, buffer, sizeof(buffer), 0);
+    pcheck(res, "recv");
     printf("Received %d bytes [%s]\n", res, buffer);
 
     return 0;

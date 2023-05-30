@@ -1,12 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
 #define BUFFER_SIZE 1024
 
+
+
+int debug_mode = 0;
+
+char *server_ip = "127.0.0.1";
+short server_port = 25552;
 
 
 void pcheck(int res, char *msg) {
@@ -16,7 +23,40 @@ void pcheck(int res, char *msg) {
 }
 
 
-int main() {
+int parse_params(int argc, char **argv) {
+    char *r;
+    if (r = getenv("LAB2ADDR"))     server_ip = r;
+    if (r = getenv("LAB2PORT"))     server_port = atoi(r);
+    if (r = getenv("LAB2DEBUG"))    debug_mode = 1;
+
+    while (1) {
+        switch (getopt(argc, argv, "a:p:vh")) {
+            case 'a':
+                server_ip = optarg;
+                break;
+            case 'p':
+                server_port = atoi(optarg);
+                break;
+            case 'v':
+                fprintf(stdout, "version\n");
+                return 1;
+            case 'h':
+                fprintf(stdout, "help\n");
+                return 1;
+            case -1:
+                return 0;
+            default:
+                return 1;
+        }
+    }
+}
+
+
+int main(int argc, char **argv) {
+
+    if (parse_params(argc, argv)) {
+        return 1;
+    }
 
     int res;
     int client_socket;
@@ -26,8 +66,8 @@ int main() {
     pcheck(client_socket, "socket failed");
 
     server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(25552);
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_address.sin_port = htons(server_port);
+    server_address.sin_addr.s_addr = inet_addr(server_ip);
 
 
     char buffer[BUFFER_SIZE] = "NIT HEH";

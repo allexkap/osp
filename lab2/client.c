@@ -59,6 +59,11 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    char *lang = "en", *number = "1984";
+    if (optind != argc) number = argv[optind++];
+    if (optind != argc) lang = argv[optind++];
+
+
     int res;
     int client_socket;
     struct sockaddr_in server_address;
@@ -74,7 +79,8 @@ int main(int argc, char **argv) {
     pcheck(res, "connect");
 
 
-    char buffer[BUFFER_SIZE] = "en\n1984\n";
+    char buffer[BUFFER_SIZE];
+    sprintf(buffer, "%s\n%s\n", lang, number);
     res = send(client_socket, buffer, strlen(buffer), 0);
     pcheck(res, "send");
     res = recv(client_socket, buffer, sizeof(buffer), 0);

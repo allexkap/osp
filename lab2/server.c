@@ -8,8 +8,9 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "numwords.h"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 
 
@@ -34,7 +35,25 @@ void pcheck(int res, char *msg) {
 
 
 void worker(char* buffer) {
-    for (int i = 0; buffer[i]; ++i) buffer[i] |= 32;
+
+    int error = 0;
+    const char *result = NULL;
+
+    int len = strlen(buffer);
+    if (buffer[len-1] == '\n') buffer[len-1] = '\0';
+    else error = 3;
+
+    if (error);
+    else if (!strncmp(buffer, "en\n", 3)) result = value2en(buffer+3);
+    else if (!strncmp(buffer, "ru\n", 3)) result = value2ru(buffer+3);
+    else error = 1;
+
+    if (error);
+    else if (result) sprintf(buffer, "%s\n", result);
+    else error = 2;
+
+    if (error) sprintf(buffer, "ERROR %d\n", error);
+
     sleep(wait_time);
 }
 
@@ -114,9 +133,13 @@ int main(int argc, char **argv) {
         if (!fork()) break;
     }
 
+    pcheck(res, "recv");
+    buffer[res] = '\0';
     worker(buffer);
     res = sendto(server_socket, buffer, strlen(buffer), 0,
         (struct sockaddr*) &client_address, sizeof(client_address));
+    pcheck(res, "send");
+
 
     return 0;
 }

@@ -7,7 +7,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 
 
 
@@ -74,10 +74,13 @@ int main(int argc, char **argv) {
     pcheck(res, "connect");
 
 
-    char buffer[BUFFER_SIZE] = "NIT HEH";
+    char buffer[BUFFER_SIZE] = "en\n1984\n";
     res = send(client_socket, buffer, strlen(buffer), 0);
+    pcheck(res, "send");
     res = recv(client_socket, buffer, sizeof(buffer), 0);
     pcheck(res, "recv");
+    buffer[res] = '\0';
+
     printf("Received %d bytes [%s]\n", res, buffer);
 
     return 0;

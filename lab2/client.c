@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     if (optind != argc) lang = argv[optind++];
 
     if (strlen(lang) + strlen(number) > BUFFER_SIZE - 3) {
-        printf("Error: Too long arguments\n");
+        fprintf(stderr, "Error: Too long arguments\n");
         exit(EXIT_FAILURE);
     }
 
@@ -87,7 +87,7 @@ int main(int argc, char **argv) {
     char buffer[BUFFER_SIZE];
     res = sprintf(buffer, "%s\n%s\n", lang, number);
     if (debug_mode)
-        printf("Sending %d bytes to %s:%d with request %s (%s)\n",
+        fprintf(stdout, "Sending %d bytes to %s:%d with request %s (%s)\n",
             res, server_ip, server_port, number, lang);
 
     res = send(client_socket, buffer, strlen(buffer), 0);
@@ -97,9 +97,9 @@ int main(int argc, char **argv) {
     buffer[res] = '\0';
 
     if (debug_mode)
-        printf("Received %d bytes from %s:%d\nAnswer: ",
+        fprintf(stdout, "Received %d bytes from %s:%d\nAnswer: ",
             res, server_ip, server_port);
-    printf("%s", buffer);
+    fprintf(stdout, "%s", buffer);
 
     return 0;
 }

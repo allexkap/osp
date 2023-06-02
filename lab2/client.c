@@ -63,6 +63,11 @@ int main(int argc, char **argv) {
     if (optind != argc) number = argv[optind++];
     if (optind != argc) lang = argv[optind++];
 
+    if (strlen(lang) + strlen(number) > BUFFER_SIZE - 3) {
+        printf("Error: Too long arguments\n");
+        exit(EXIT_FAILURE);
+    }
+
 
     int res;
     int client_socket;

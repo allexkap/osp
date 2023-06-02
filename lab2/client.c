@@ -87,7 +87,8 @@ int main(int argc, char **argv) {
     pcheck(res, "recv");
     buffer[res] = '\0';
 
-    printf("Received %d bytes [%s]\n", res, buffer);
+    printf("Received %d bytes from %s:%d with request %s (%s)\nAnswer: %s",
+        res, server_ip, server_port, number, lang, buffer);
 
     return 0;
 }

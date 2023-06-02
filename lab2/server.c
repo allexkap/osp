@@ -84,10 +84,10 @@ int parse_params(int argc, char **argv) {
                 demon_mode = 1;
                 break;
             case 'v':
-                fprintf(stdout, "version\n");
+                fprintf(stdout, "Version 0.42\n");
                 return 1;
             case 'h':
-                fprintf(stdout, "help\n");
+                fprintf(stdout, "Usage: ./prog [-w <time>] [-d] [-l <path>] [-a <ip>] [-p <port>]\n");
                 return 1;
             case -1:
                 return 0;

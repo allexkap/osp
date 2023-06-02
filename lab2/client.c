@@ -39,10 +39,10 @@ int parse_params(int argc, char **argv) {
                 server_port = atoi(optarg);
                 break;
             case 'v':
-                fprintf(stdout, "version\n");
+                fprintf(stdout, "Version 0.42\n");
                 return 1;
             case 'h':
-                fprintf(stdout, "help\n");
+                fprintf(stdout, "Usage: ./prog [-a <ip>] [-p <port>] [number [lang]]\n");
                 return 1;
             case -1:
                 return 0;

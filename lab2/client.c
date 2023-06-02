@@ -69,14 +69,14 @@ int main(int argc, char **argv) {
     struct sockaddr_in server_address;
 
     client_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    pcheck(client_socket, "socket failed");
+    pcheck(client_socket, "Socket failed");
 
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(server_port);
     server_address.sin_addr.s_addr = inet_addr(server_ip);
 
     res = connect(client_socket, (struct sockaddr*) &server_address, sizeof(server_address));
-    pcheck(res, "connect");
+    pcheck(res, "Connecting failed");
 
 
     char buffer[BUFFER_SIZE];
@@ -86,9 +86,9 @@ int main(int argc, char **argv) {
             res, server_ip, server_port, number, lang);
 
     res = send(client_socket, buffer, strlen(buffer), 0);
-    pcheck(res, "send");
+    pcheck(res, "Sending failed");
     res = recv(client_socket, buffer, sizeof(buffer), 0);
-    pcheck(res, "recv");
+    pcheck(res, "Receiving failed");
     buffer[res] = '\0';
 
     if (debug_mode)

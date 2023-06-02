@@ -80,15 +80,21 @@ int main(int argc, char **argv) {
 
 
     char buffer[BUFFER_SIZE];
-    sprintf(buffer, "%s\n%s\n", lang, number);
+    res = sprintf(buffer, "%s\n%s\n", lang, number);
+    if (debug_mode)
+        printf("Sending %d bytes to %s:%d with request %s (%s)\n",
+            res, server_ip, server_port, number, lang);
+
     res = send(client_socket, buffer, strlen(buffer), 0);
     pcheck(res, "send");
     res = recv(client_socket, buffer, sizeof(buffer), 0);
     pcheck(res, "recv");
     buffer[res] = '\0';
 
-    printf("Received %d bytes from %s:%d with request %s (%s)\nAnswer: %s",
-        res, server_ip, server_port, number, lang, buffer);
+    if (debug_mode)
+        printf("Received %d bytes from %s:%d\nAnswer: ",
+            res, server_ip, server_port);
+    printf("%s", buffer);
 
     return 0;
 }

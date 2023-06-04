@@ -18,6 +18,7 @@
 int debug_mode = 0, demon_mode = 0;
 int wait_time = 0;
 char *log_path = "/tmp/lab2.log";
+FILE *log_file = NULL;
 
 char *server_ip = "127.0.0.1";
 short server_port = 25552;
@@ -31,6 +32,7 @@ void remove_child(int) {
 void pcheck(int res, char *msg) {
     if (res >= 0) return;
     perror(msg);
+    if (stderr = log_file) perror(msg);
     exit(EXIT_FAILURE);
 }
 
@@ -114,7 +116,7 @@ int main(int argc, char **argv) {
 
     if (demon_mode && fork()) return 0;
 
-    FILE *log_file = fopen(log_path, "w");
+    log_file = fopen(log_path, "w");
     pcheck(!!log_file-1, "log");
 
 

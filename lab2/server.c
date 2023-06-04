@@ -165,5 +165,7 @@ int main(int argc, char **argv) {
     else fprintf(log_file, "%s [%d] Error %d\n", now(), getpid(), ret);
     fflush(log_file);
 
+    fclose(log_file);
+
     return !!ret;
 }

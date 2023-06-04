@@ -8,6 +8,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <time.h>
 #include "numwords.h"
 
 #define BUFFER_SIZE 2048
@@ -31,6 +32,13 @@ void pcheck(int res, char *msg) {
     if (res >= 0) return;
     perror(msg);
     exit(EXIT_FAILURE);
+}
+
+
+const char* now() {
+    static char buff[18];
+    strftime(buff, 18, "%d.%m.%y %H:%M:%S", localtime(&(time_t){time(0)}));
+    return buff;
 }
 
 
@@ -106,6 +114,10 @@ int main(int argc, char **argv) {
 
     if (demon_mode && fork()) return 0;
 
+    FILE *log_file = fopen(log_path, "w");
+    pcheck(!!log_file-1, "log");
+
+
     int res;
     int server_socket;
     struct sockaddr_in server_address, client_address;
@@ -135,11 +147,18 @@ int main(int argc, char **argv) {
 
     pcheck(res, "recv");
     buffer[res] = '\0';
+
+    fprintf(log_file, "%s [%d] New request\n", now(), getpid());
+    fflush(log_file);
+
     worker(buffer);
+
     res = sendto(server_socket, buffer, strlen(buffer), 0,
         (struct sockaddr*) &client_address, sizeof(client_address));
     pcheck(res, "send");
 
+    fprintf(log_file, "%s [%d] Success\n", now(), getpid());
+    fflush(log_file);
 
     return 0;
 }

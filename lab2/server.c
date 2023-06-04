@@ -29,6 +29,12 @@ void remove_child(int) {
 }
 
 
+void safe_exit() {
+    if (log_file) fclose(log_file);
+    exit(EXIT_SUCCESS);
+}
+
+
 void pcheck(int res, char *msg) {
     if (res >= 0) return;
     perror(msg);
@@ -140,6 +146,7 @@ int main(int argc, char **argv) {
     pcheck(res, "bind");
 
     signal(SIGCHLD, remove_child);
+    signal(SIGINT, safe_exit);
 
 
     char buffer[BUFFER_SIZE] = {};

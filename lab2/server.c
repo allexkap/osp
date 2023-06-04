@@ -44,7 +44,7 @@ const char* now() {
 }
 
 
-void worker(char* buffer) {
+int worker(char* buffer) {
 
     int error = 0;
     const char *result = NULL;
@@ -65,6 +65,8 @@ void worker(char* buffer) {
     if (error) sprintf(buffer, "ERROR %d\n", error);
 
     sleep(wait_time);
+
+    return error;
 }
 
 
@@ -153,14 +155,15 @@ int main(int argc, char **argv) {
     fprintf(log_file, "%s [%d] New request\n", now(), getpid());
     fflush(log_file);
 
-    worker(buffer);
+    int ret = worker(buffer);
 
     res = sendto(server_socket, buffer, strlen(buffer), 0,
         (struct sockaddr*) &client_address, sizeof(client_address));
     pcheck(res, "send");
 
-    fprintf(log_file, "%s [%d] Success\n", now(), getpid());
+    if (!ret) fprintf(log_file, "%s [%d] Success\n", now(), getpid());
+    else fprintf(log_file, "%s [%d] Error %d\n", now(), getpid(), ret);
     fflush(log_file);
 
-    return 0;
+    return !!ret;
 }

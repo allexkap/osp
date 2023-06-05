@@ -24,15 +24,32 @@ char *server_ip = "127.0.0.1";
 short server_port = 25552;
 
 
+int stats[2] = {};
+
+
+
 void remove_child(int) {
-    wait(NULL);
+    int status;
+    while (waitpid(-1, &status, WNOHANG) > 0) {
+        ++stats[!WIFEXITED(status) || WEXITSTATUS(status)];
+    }
 }
 
 
-void safe_exit() {
+const char* now();
+void show_stats(int) {
+    fprintf(stdout, "Successful requests %d/%d\n", stats[0], stats[0]+stats[1]);
+    fprintf(log_file, "%s [%d] Successful requests %d/%d\n",
+        now(), getpid(), stats[0], stats[0]+stats[1]);
+    fflush(log_file);
+}
+
+
+void safe_exit(int) {
     if (log_file) fclose(log_file);
     exit(EXIT_SUCCESS);
 }
+
 
 
 void pcheck(int res, char *msg) {
@@ -145,12 +162,21 @@ int main(int argc, char **argv) {
     res = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
     pcheck(res, "bind");
 
+
     struct sigaction action;
     action.sa_flags = SA_RESTART;
-    action.sa_handler = remove_child;
-    sigaction(SIGCHLD, &action, NULL);
+
     action.sa_handler = safe_exit;
     sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, NULL);
+    sigaction(SIGQUIT, &action, NULL);
+
+    action.sa_handler = show_stats;
+    sigaction(SIGUSR1, &action, NULL);
+
+    sigaddset(&action.sa_mask, SIGUSR1);
+    action.sa_handler = remove_child;
+    sigaction(SIGCHLD, &action, NULL);
 
 
     char buffer[BUFFER_SIZE] = {};

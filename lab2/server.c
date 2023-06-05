@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
     struct sockaddr_in server_address, client_address;
 
     server_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    pcheck(server_socket, "socket failed");
+    pcheck(server_socket, "socket");
 
     res = setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int));
     pcheck(res, "setsockopt");
@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
         if (!fork()) break;
     }
 
-    pcheck(res, "recv");
+    pcheck(res, "recvfrom");
     buffer[res] = '\0';
 
     fprintf(log_file, "%s [%d] New request\n", now(), getpid());
@@ -196,7 +196,7 @@ int main(int argc, char **argv) {
 
     res = sendto(server_socket, buffer, strlen(buffer), 0,
         (struct sockaddr*) &client_address, sizeof(client_address));
-    pcheck(res, "send");
+    pcheck(res, "sendto");
 
     if (!ret) fprintf(log_file, "%s [%d] Success\n", now(), getpid());
     else fprintf(log_file, "%s [%d] Error %d\n", now(), getpid(), ret);

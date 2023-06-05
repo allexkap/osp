@@ -145,8 +145,12 @@ int main(int argc, char **argv) {
     res = bind(server_socket, (struct sockaddr*) &server_address, sizeof(server_address));
     pcheck(res, "bind");
 
-    signal(SIGCHLD, remove_child);
-    signal(SIGINT, safe_exit);
+    struct sigaction action;
+    action.sa_flags = SA_RESTART;
+    action.sa_handler = remove_child;
+    sigaction(SIGCHLD, &action, NULL);
+    action.sa_handler = safe_exit;
+    sigaction(SIGINT, &action, NULL);
 
 
     char buffer[BUFFER_SIZE] = {};

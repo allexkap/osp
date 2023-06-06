@@ -165,6 +165,7 @@ int main(int argc, char **argv) {
 
     struct sigaction action;
     action.sa_flags = SA_RESTART;
+    sigemptyset(&action.sa_mask);
 
     action.sa_handler = safe_exit;
     sigaction(SIGINT, &action, NULL);

@@ -14,7 +14,7 @@
 int debug_mode = 0;
 
 char *server_ip = "127.0.0.1";
-short server_port = 25552;
+unsigned short server_port = 25552;
 
 
 void pcheck(int res, char *msg) {
@@ -82,7 +82,7 @@ int main(int argc, char **argv) {
     char buffer[BUFFER_SIZE];
     snprintf(buffer, BUFFER_SIZE, "%s\n%s\n", lang, number);
     if (debug_mode)
-        fprintf(stdout, "Sending %d bytes to %s:%d with request %s (%s)\n",
+        fprintf(stdout, "Sending %d bytes to %s:%hu with request %s (%s)\n",
             res, server_ip, server_port, number, lang);
 
     res = send(client_socket, buffer, strlen(buffer), 0);
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
     buffer[res] = '\0';
 
     if (debug_mode)
-        fprintf(stdout, "Received %d bytes from %s:%d\nAnswer: ",
+        fprintf(stdout, "Received %d bytes from %s:%hu\nAnswer: ",
             res, server_ip, server_port);
     fprintf(stdout, "%s", buffer);
 

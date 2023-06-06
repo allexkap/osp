@@ -21,7 +21,7 @@ char *log_path = "/tmp/lab2.log";
 FILE *log_file = NULL;
 
 char *server_ip = "127.0.0.1";
-short server_port = 25552;
+unsigned short server_port = 25552;
 
 
 int stats[2] = {};

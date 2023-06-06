@@ -148,6 +148,8 @@ int main(int argc, char **argv) {
     int res;
     int server_socket;
     struct sockaddr_in server_address, client_address;
+    char *client_ip = NULL;
+    unsigned short client_port = 0;
 
     server_socket = socket(AF_INET, SOCK_DGRAM, 0);
     pcheck(server_socket, "socket");
@@ -190,18 +192,37 @@ int main(int argc, char **argv) {
     pcheck(res, "recvfrom");
     buffer[res] = '\0';
 
-    fprintf(log_file, "%s [%d] New request\n", now(), getpid());
+
+    client_ip = inet_ntoa(client_address.sin_addr);
+    client_port = ntohs(client_address.sin_port);
+
+    fprintf(log_file, "%s [%d] Received %d bytes from %s:%hu\n",
+        now(), getpid(), res, client_ip, client_port);
     fflush(log_file);
 
+    if (debug_mode)
+        fprintf(stdout, "Received %d bytes from %s:%hu\n",
+            res, client_ip, client_port);
+
+
     int ret = worker(buffer);
+
+    if (!ret) fprintf(log_file, "%s [%d] Success\n", now(), getpid());
+    else fprintf(log_file, "%s [%d] Error %d\n", now(), getpid(), ret);
+    fflush(log_file);
+
 
     res = sendto(server_socket, buffer, strlen(buffer), 0,
         (struct sockaddr*) &client_address, sizeof(client_address));
     pcheck(res, "sendto");
 
-    if (!ret) fprintf(log_file, "%s [%d] Success\n", now(), getpid());
-    else fprintf(log_file, "%s [%d] Error %d\n", now(), getpid(), ret);
+    fprintf(log_file, "%s [%d] Sending %d bytes to %s:%hu\n",
+        now(), getpid(), res, client_ip, client_port);
     fflush(log_file);
+
+    if (debug_mode)
+        fprintf(stdout, "Sending %d bytes to %s:%hu\n",
+            res, client_ip, client_port);
 
     fclose(log_file);
 

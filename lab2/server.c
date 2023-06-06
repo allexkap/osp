@@ -55,7 +55,10 @@ void safe_exit(int) {
 void pcheck(int res, char *msg) {
     if (res >= 0) return;
     perror(msg);
-    if (stderr = log_file) perror(msg);
+    if (stderr = log_file) {
+        fprintf(stderr, "%s [%d] ", now(), getpid());
+        perror(msg);
+    }
     exit(EXIT_FAILURE);
 }
 

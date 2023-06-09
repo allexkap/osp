@@ -23,7 +23,7 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
 
     if (byte == -1) {
         for (size_t i = 0; !arg && i < in_opts_len; ++i)
-            if (!strcmp(in_opts[i].name, "parity"))
+            if (!strcmp(in_opts[i].name, "freq-byte"))
                 arg = (char*)in_opts[i].flag;
         if (!arg) {
             fprintf(stderr, "Error parsing arguments for option --freq-byte: Argument not found\n");

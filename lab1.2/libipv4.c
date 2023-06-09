@@ -13,6 +13,15 @@ static size_t arglen = 0;
 static int state = 0;
 
 
+int strnfcmp(const char *str1, const char *str2, int num) {
+    for (int i = 0; i < num; ++i) {
+        if (str1[i] > str2[i]) return 1;
+        else if (str1[i] < str2[i]) return -1;
+    }
+    return 0;
+}
+
+
 int plugin_get_info(struct plugin_info* ppi) {
     static struct plugin_option sup_opts[] = {
         {{"ipv4-addr", required_argument, (int*) &arg, 0}, "like x.x.x.x"},
@@ -74,8 +83,8 @@ int plugin_process_file(const char *fname, struct option in_opts[], size_t in_op
         goto end;
     }
 
-    for (int i = 0; i < st.st_size; ++i) {
-        if (!strncmp(ptr+i, arg, arglen) || !strncmp(ptr+i, argbin, 4)) {
+    for (int i = 0; i < st.st_size-3; ++i) {
+        if (!strncmp(ptr+i, arg, arglen) || !strnfcmp(ptr+i, argbin, 4)) {
             exit_code = 0;
             goto end;
         }
